@@ -63,7 +63,7 @@
   CONFIG  EBTRB = OFF           ; Boot Block Table Read Protection bit (Boot block (000000-0007FFh) is not protected from table reads executed in other blocks)
 
 
-;****************Definicion de variables********************************
+;*****Definicion de variables***********
 PSECT udata
 INPUT:
 	DS 1
@@ -85,16 +85,23 @@ AUX2:
 	DS 1
 AUX3:
 	DS 1
-CONTADOR1:
+IMP:
+	DS 1
+INIT_VALUE:
 	DS 1
 RESULT:
 	DS 1
-	
+MIN:
+	DS 1
+SEGD:
+	DS 1
+SEGU:
+	DS 1
 ;
 ;PSECT text,class = CODE
 
 
-;****************Programa principal **************************************************
+;*****Programa principal *****************
 	PSECT   code;barfunc,local,class=CODE,delta=2 ; PIC10/12/16
 	
 			ORG     0x00             	;reset vector
@@ -107,182 +114,86 @@ INICIALIZACION:
 			SETF	LATB,c			;PORTB como entrada
 			CLRF	LATD,c			;PORTD como salida
 			CLRF	LATA,c			;PORTA como salida
+			CLRF	LATC,c			;PORTC como salida
 			SETF	TRISB,c			;PORTB como entrada
 			CLRF	TRISD,c			;PORTD como salida
 			CLRF	TRISA,c			;PORTA como salida
-			CLRF    PORTB
+			CLRF	TRISC,c			;PORTA como salida
 
+			MOVLW 0
+			MOVWF INIT_VALUE
 			MOVLW 0x00
-			MOVWF CONTADOR1
-			MOVLW 0x09
 			MOVWF RESULT
 			MOVLW 0x00
 			MOVWF AUX3
+			
+			MOVLW 0x00
+			MOVWF MIN
+			MOVLW 0x00
+			MOVWF SEGD
+			MOVLW 0x00
+			MOVWF SEGU
+		
 			RETURN
 
 MAIN:
 		CALL 	INICIALIZACION
 
 			
-LOOP2:
-			
-			MOVLW	0x00		    ;mover 0 al acumulador
-			SUBWF	RESULT,	0,1	    ;restar 0 a la entrada
-			BZ	CERO		    ;caso 0 
-			
-			MOVLW	0x01		    ;mover 1 al acumulador
-			SUBWF	RESULT,	0,1	    ;restar 1 a la entrada
-			BZ	UNO		    ;caso 1 
-			
-			MOVLW	0x02		    ;mover 2 al acumulador
-			SUBWF	RESULT,	W	    ;restar 2 a la entrada
-			BZ	DOS		    ;caso 2 
-			
-			MOVLW	0x03		    ;mover 3 al acumulador
-			SUBWF	RESULT,	W	    ;restar 3 a la entrada
-			BZ	TRES		    ;caso 3 
-			
-			MOVLW	0x04		    ;mover 4 al acumulador
-			SUBWF	RESULT,	W	    ;restar 4 a la entrada
-			BZ	CUATRO		    ;caso 4 
-			
-			MOVLW	0x05		    ;mover 5 al acumulador
-			SUBWF	RESULT,	W	    ;restar 5 a la entrada
-			BZ	CINCO		    ;caso 5 
-			
-			MOVLW	0x06		    ;mover 6 al acumulador
-			SUBWF	RESULT,	W	    ;restar 6 a la entrada
-			BZ	SEIS		    ;caso 6
-			
-			MOVLW	0x07		    ;mover 7 al acumulador
-			SUBWF	RESULT,	W	    ;restar 7 a la entrada
-			BZ	SIETE		    ;caso 7 
-			
-			MOVLW	0x08		    ;mover 8 al acumulador
-			SUBWF	RESULT,	W	    ;restar 8 a la entrada
-			BZ	OCHO		    ;caso 8 
-			
-			MOVLW	0x09		    ;mover 8 al acumulador
-			SUBWF	RESULT,	W	    ;restar 8 a la entrada
-			BZ	NUEVE		    ;caso 8 
-		
-			
-			BRA	DEFAULT
-			
-			
-CERO:
-						    ;salida 0 en display
-		    MOVLW 00111111B
-		    MOVWF PORTD
-		    CALL DELAY
-		    MOVLW 0x09			;reseteo a 9
-		    MOVWF RESULT
-		    GOTO LOOP2
-		    
-UNO:
-		    MOVLW 00000110B		    ;salida 1 en display
-		    MOVWF PORTD
-		    CALL DELAY
-		    DECF	RESULT, 1
-		    GOTO LOOP2	    
-		    
-DOS:
-		    MOVLW 01011011B		    ;salida 2 en display
-		    MOVWF PORTD
-		    CALL DELAY
-		    DECF	RESULT, 1
-		    GOTO LOOP2    
-		    
-TRES:
-		    MOVLW 01001111B		   ;salida 3 en display
-		    MOVWF PORTD
-		    CALL DELAY
-		    DECF	RESULT, 1
-		    GOTO LOOP2
-		    
-CUATRO:						  
-		    MOVLW 01100110B		    ;salida 4 en display
-		    MOVWF PORTD
-		    CALL DELAY
-		    DECF	RESULT, 1
-		    GOTO LOOP2
-
-CINCO:						  
-		    MOVLW 01101101B		    ;salida 5 en display
-		    MOVWF PORTD
-		    CALL DELAY
-		    DECF	RESULT, 1
-		    GOTO LOOP2
-		    
-SEIS:						  
-		    MOVLW 01111101B		    ;salida 6 en display
-		    MOVWF PORTD
-		    CALL DELAY
-		    DECF	RESULT, 1
-		    GOTO LOOP2
-		    
-SIETE:						  
-		    MOVLW 00000111B		    ;salida 7 en display
-		    MOVWF PORTD
-		    CALL DELAY
-		    DECF	RESULT, 1
-		    GOTO LOOP2
-OCHO:						  
-		    MOVLW 01111111B		    ;salida 8 en display
-		    MOVWF PORTD
-		    CALL DELAY
-		    DECF	RESULT, 1		  ;decrementar en 1 el contador
-		    GOTO LOOP2
-NUEVE:						  
-		    MOVLW 01101111B		    ;salida 9 en display
-		    MOVWF PORTD
-		    CALL DELAY
-		    DECF	RESULT, 1		  ;decrementar en 1 el contador
-		    GOTO LOOP2
-
-		    
-		    
-DEFAULT:	
-		    MOVLW 00110111B		    ;salida N en display
-		    MOVWF PORTD
-		    CALL DELAY_10S
-
-		      
-DELAY:		
-	
-				       
-			DECISION:
-    
+LOOP:
 			BTFSC PORTB,0
-			CALL  INCRE
+			CALL  PAUSA
 			BTFSC PORTB,1
-			CALL  DECRE
-
-			CALL LEDS
+			CALL  PLAY
+			BTFSC PORTB,2
+			CALL  PRECARGA
+			MOVF INIT_VALUE, W		;movemos el limite al contador
+		        MOVFF INIT_VALUE, RESULT
+			CALL OP
+GOTO LOOP
+			
+			
+			
+PRECARGA:
+		       CALL   DELAY_1DS
+		       BTFSC   PORTB,2  
+		       GOTO   PRECARGA
+		       MOVLW  0xB4
+		       CPFSEQ INIT_VALUE		    ;bandera de alto si ya es igual al limite
+		       INCF   INIT_VALUE, 1
+		       GOTO LOOP
 		       
+PAUSA:
+		       CALL   OP
+		       GOTO LOOP
 		       
-		        MOVLW	0x00		    ;mover 0 al acumulador
-			SUBWF	CONTADOR1,	0,1	    ;restar 0 a la entrada
-			BZ	DELAY_1DS		    ;caso 0 
+RETURN       
+		  
+		       
+PLAY:
+		    
+		    MOVF INIT_VALUE, W		;movemos el limite al contador
+		    MOVFF INIT_VALUE, RESULT
+		    CONTINUAR:
+			BTFSC PORTB,0
+			GOTO  PAUSA
+			BTFSC PORTB,1
+			GOTO  PLAY
+			BTFSC PORTB,2
+			GOTO  PRECARGA
+		    CALL DELAY
+		    DECF	RESULT, 1
+		    MOVLW	0
+		    CPFSEQ	RESULT
+		    GOTO CONTINUAR
+		    GOTO LOOP
+		    
+DELAY:
+		    CALL DELAY_1S
+		    CALL OP
+		    RETURN
+    
 			
-			MOVLW	0x01		    ;mover 1 al acumulador
-			SUBWF	CONTADOR1,	0,1	    ;restar 1 a la entrada
-			BZ	DELAY_5DS		    ;caso 1 
-			
-			MOVLW	0x02		    ;mover 2 al acumulador
-			SUBWF	CONTADOR1,	W	    ;restar 2 a la entrada
-			BZ	DELAY_1S		    ;caso 2 
-			
-			MOVLW	0x03		    ;mover 3 al acumulador
-			SUBWF	CONTADOR1,	W	    ;restar 3 a la entrada
-			BZ	DELAY_5S		    ;caso 3 
-			
-			MOVLW	0x04		    ;mover 4 al acumulador
-			SUBWF	CONTADOR1,	W	    ;restar 4 a la entrada
-			BZ	DELAY_10S		    ;caso 4 
-			
-			
-	RETURN
 DELAY_1DS:	    
 		    MOVLW 255
 		    MOVWF TEMP
@@ -335,97 +246,331 @@ DELAY_10S:
 		    CALL DELAY_1S
 		    DECFSZ V5
 		    GOTO $-6
-		    RETURN
+		    RETURN	
 		    
- 		
-		    INCRE:
-		       CALL   DELAY_1DS
-		       BTFSC   PORTB,0  
-		       GOTO   INCRE
-		       MOVLW  0x04
-		       CPFSEQ CONTADOR1		    ;bandera de alto si ya es igual al limite
-		       INCF   CONTADOR1, F
-		       RETURN
-		
-		    DECRE:
-		       CALL   DELAY_1DS
-		       BTFSC   PORTB,1 
-		       GOTO   DECRE
-		       MOVLW  0x00
-		       CPFSEQ CONTADOR1
-		       DECF   CONTADOR1, F
-		       RETURN
-		       
-	LEDS:
+		    
+		    
+OP:
+			MOVFF  RESULT, IMP
+			MOVF   IMP, W
+			SUBLW  60
+			BN     SET_MINUTOS
+			MOVF   IMP, W
+		SD:	SUBLW  9		    ;9-impresion 
+			BN    SET_SEGUNDOSD	    ;aun es mayor a 9 
+		MI:				   
+			GOTO  SET_SEGUNDOSU	    ;ponemos segundos unitarios
+
+			RETURN
 			
-			MOVLW  0x01
-		       CPFSEQ AUX3
-		       GOTO APAGAR	;no igual
-		       
-		       MOVLW 0x00
-			MOVWF AUX3
+SET_MINUTOS:
+			MOVLW 60
+			SUBWF IMP , 1	    ;el numero que dimos -60
+			INCF  MIN, 1	;incrementamos 1 minuto
+			MOVLW 60	
+			CPFSGT IMP	;impresion sigue siendo mayor que 60?
+			GOTO SD		;no
+			GOTO  SET_MINUTOS		 ;si; repetir proceso
+			
+			
+SET_SEGUNDOSD:
+			MOVLW 10
+			SUBWF IMP , 1	    ;el numero que dimos -10
+			INCF  SEGD, 1	;incrementamos 1 decimas de segundo
+			MOVLW 10	
+			CPFSGT IMP	;impresion sigue siendo mayor que 10?
+			GOTO MI		;no
+			GOTO  SET_SEGUNDOSD		 ;si; repetir proceso
+			
+SET_SEGUNDOSU:
+
+			MOVFF   IMP, SEGU
+			
 			
 			MOVLW	0x00		    ;mover 0 al acumulador
-			SUBWF	CONTADOR1,	0,1	    ;restar 0 a la entrada
-			BZ	LED0		    ;caso 0 
-
+			SUBWF	SEGU,	0,1	    ;restar 0 a la entrada
+			BZ	CERO1		    ;caso 0 
+			
 			MOVLW	0x01		    ;mover 1 al acumulador
-			SUBWF	CONTADOR1,	0,1	    ;restar 1 a la entrada
-			BZ	LED1	    ;caso 1 
-
+			SUBWF	SEGU,	0,1	    ;restar 1 a la entrada
+			BZ	UNO1	    ;caso 1 
+			
 			MOVLW	0x02		    ;mover 2 al acumulador
-			SUBWF	CONTADOR1,	W	    ;restar 2 a la entrada
-			BZ	LED2		    ;caso 2 
-
+			SUBWF	SEGU,	W	    ;restar 2 a la entrada
+			BZ	DOS1		    ;caso 2 
+			
 			MOVLW	0x03		    ;mover 3 al acumulador
-			SUBWF	CONTADOR1,	W	    ;restar 3 a la entrada
-			BZ	LED3		    ;caso 3 
-
+			SUBWF	SEGU,	W	    ;restar 3 a la entrada
+			BZ	TRES1		    ;caso 3 
+			
 			MOVLW	0x04		    ;mover 4 al acumulador
-			SUBWF	CONTADOR1,	W	    ;restar 4 a la entrada
-			BZ	LED4		    ;caso 4 
-					
-			LED0:
-		       MOVLW	00000001B
-		       MOVWF    PORTA
-		       RETURN
-		       
-		       LED1:
-		       MOVLW	00000010B
-		       MOVWF    PORTA
-		       RETURN
-		       
-		       
-		       LED2:
-		       MOVLW	00000100B
-		       MOVWF    PORTA
-		       RETURN
-		       
-		       
-		       LED3:
-		       MOVLW	00001000B
-		       MOVWF    PORTA
-		       RETURN
-		       
-		       
-		       LED4:
-		       MOVLW	00010000B
-		       MOVWF    PORTA
-		       RETURN
-		       
-		       APAGAR:
-		       MOVLW	00000000B
-		       MOVWF    PORTA
-		       MOVLW 0x01
-		       MOVWF AUX3
-		       RETURN
-		       
+			SUBWF	SEGU,	W	    ;restar 4 a la entrada
+			BZ	CUATRO1		    ;caso 4 
+			
+			MOVLW	0x05		    ;mover 5 al acumulador
+			SUBWF	SEGU,	W	    ;restar 5 a la entrada
+			BZ	CINCO1		    ;caso 5 
+			
+			MOVLW	0x06		    ;mover 6 al acumulador
+			SUBWF	SEGU,	W	    ;restar 6 a la entrada
+			BZ	SEIS1		    ;caso 6
+			
+			MOVLW	0x07		    ;mover 7 al acumulador
+			SUBWF	SEGU,	W	    ;restar 7 a la entrada
+			BZ	SIETE1		    ;caso 7 
+			
+			MOVLW	0x08		    ;mover 8 al acumulador
+			SUBWF	SEGU,	W	    ;restar 8 a la entrada
+			BZ	OCHO1		    ;caso 8 
+			
+			MOVLW	0x09		    ;mover 8 al acumulador
+			SUBWF	SEGU,	W	    ;restar 8 a la entrada
+			BZ	NUEVE1		    ;caso 8 
+			
+			
+	DECS:				
+			
+			MOVLW	0x00		    ;mover 0 al acumulador
+			SUBWF	SEGD,	0,1	    ;restar 0 a la entrada
+			BZ	CERO2		    ;caso 0 
+			
+			MOVLW	0x01		    ;mover 1 al acumulador
+			SUBWF	SEGD,	0,1	    ;restar 1 a la entrada
+			BZ	UNO2	    ;caso 1 
+			
+			MOVLW	0x02		    ;mover 2 al acumulador
+			SUBWF	SEGD,	W	    ;restar 2 a la entrada
+			BZ	DOS2		    ;caso 2 
+			
+			MOVLW	0x03		    ;mover 3 al acumulador
+			SUBWF	SEGD,	W	    ;restar 3 a la entrada
+			BZ	TRES2		    ;caso 3 
+			
+			MOVLW	0x04		    ;mover 4 al acumulador
+			SUBWF	SEGD,	W	    ;restar 4 a la entrada
+			BZ	CUATRO2		    ;caso 4 
+			
+			MOVLW	0x05		    ;mover 5 al acumulador
+			SUBWF	SEGD,	W	    ;restar 5 a la entrada
+			BZ	CINCO2		    ;caso 5 
+			
+			MOVLW	0x06		    ;mover 6 al acumulador
+			SUBWF	SEGD,	W	    ;restar 6 a la entrada
+			BZ	SEIS2		    ;caso 6
+			
+			MOVLW	0x07		    ;mover 7 al acumulador
+			SUBWF	SEGD,	W	    ;restar 7 a la entrada
+			BZ	SIETE2		    ;caso 7 
+			
+			MOVLW	0x08		    ;mover 8 al acumulador
+			SUBWF	SEGD,	W	    ;restar 8 a la entrada
+			BZ	OCHO2		    ;caso 8 
+			
+			MOVLW	0x09		    ;mover 8 al acumulador
+			SUBWF	SEGD,	W	    ;restar 8 a la entrada
+			BZ	NUEVE2		    ;caso 8 
+			
+			
+	MINS:					
+			
+			MOVLW	0x00		    ;mover 0 al acumulador
+			SUBWF	MIN,	0,1	    ;restar 0 a la entrada
+			BZ	CERO3		    ;caso 0 
+			
+			MOVLW	0x01		    ;mover 1 al acumulador
+			SUBWF	MIN,	0,1	    ;restar 1 a la entrada
+			BZ	UNO3	    ;caso 1 
+			
+			MOVLW	0x02		    ;mover 2 al acumulador
+			SUBWF	MIN,	W	    ;restar 2 a la entrada
+			BZ	DOS3		    ;caso 2 
+			
+			MOVLW	0x03		    ;mover 3 al acumulador
+			SUBWF	MIN,	W	    ;restar 3 a la entrada
+			BZ	TRES3		    ;caso 3 
+			
+			MOVLW	0x04		    ;mover 4 al acumulador
+			SUBWF	MIN,	W	    ;restar 4 a la entrada
+			BZ	CUATRO3		    ;caso 4 
+			
+			MOVLW	0x05		    ;mover 5 al acumulador
+			SUBWF	MIN,	W	    ;restar 5 a la entrada
+			BZ	CINCO3		    ;caso 5 
+			
+			MOVLW	0x06		    ;mover 6 al acumulador
+			SUBWF	MIN,	W	    ;restar 6 a la entrada
+			BZ	SEIS3		    ;caso 6
+			
+			MOVLW	0x07		    ;mover 7 al acumulador
+			SUBWF	MIN,	W	    ;restar 7 a la entrada
+			BZ	SIETE3		    ;caso 7 
+			
+			MOVLW	0x08		    ;mover 8 al acumulador
+			SUBWF	MIN,	W	    ;restar 8 a la entrada
+			BZ	OCHO3		    ;caso 8 
+			
+			MOVLW	0x09		    ;mover 8 al acumulador
+			SUBWF	MIN,	W	    ;restar 8 a la entrada
+			BZ	NUEVE3		    ;caso 8 
+			
+			
+			
+			
+		
+			
+CERO1:
+						    ;salida 0 en display
+		    MOVLW 00111111B
+		    MOVWF PORTD
+		    GOTO DECS
 		    
-END                       	
+UNO1:
+		    MOVLW 00000110B		    ;salida 1 en display
+		    MOVWF PORTD
+		    GOTO DECS		    
+DOS1:
+		    MOVLW 01011011B		    ;salida 2 en display
+		    MOVWF PORTD
+GOTO DECS
+TRES1:
+		    MOVLW 01001111B		   ;salida 3 en display
+		    MOVWF PORTD
+GOTO DECS
+		    
+CUATRO1:						  
+		    MOVLW 01100110B		    ;salida 4 en display
+		    MOVWF PORTD
+GOTO DECS
+CINCO1:						  
+		    MOVLW 01101101B		    ;salida 5 en display
+		    MOVWF PORTD
+GOTO DECS
+		    
+SEIS1:						  
+		    MOVLW 01111101B		    ;salida 6 en display
+		    MOVWF PORTD
+GOTO DECS
+		    
+SIETE1:						  
+		    MOVLW 00000111B		    ;salida 7 en display
+		    MOVWF PORTD
+GOTO DECS
+OCHO1:						  
+		    MOVLW 01111111B		    ;salida 8 en display
+		    MOVWF PORTD
+GOTO DECS
+NUEVE1:						  
+		    MOVLW 01101111B		    ;salida 9 en display
+		    MOVWF PORTD
+		   GOTO DECS
+		    
+		   
+		   
+CERO2:
+						    ;salida 0 en display
+		    MOVLW 00111111B
+		    MOVWF PORTA
+GOTO MINS
+		    
+UNO2:
+		    MOVLW 00000110B		    ;salida 1 en display
+		    MOVWF PORTA
+GOTO MINS
 
+		    
+DOS2:
+		    MOVLW 01011011B		    ;salida 2 en display
+		    MOVWF PORTA
+GOTO MINS
 
+TRES2:
+		    MOVLW 01001111B		   ;salida 3 en display
+		    MOVWF PORTA
+GOTO MINS
 
+		    
+CUATRO2:						  
+		    MOVLW 01100110B		    ;salida 4 en display
+		    MOVWF PORTA
+GOTO MINS
 
+CINCO2:						  
+		    MOVLW 01101101B		    ;salida 5 en display
+		    MOVWF PORTA
+GOTO MINS
 
+		    
+SEIS2:						  
+		    MOVLW 01111101B		    ;salida 6 en display
+		    MOVWF PORTA
+GOTO MINS
 
+		    
+SIETE2:						  
+		    MOVLW 00000111B		    ;salida 7 en display
+		    MOVWF PORTA
+GOTO MINS
 
+OCHO2:						  
+		    MOVLW 01111111B		    ;salida 8 en display
+		    MOVWF PORTA
+GOTO MINS
+
+NUEVE2:						  
+		    MOVLW 01101111B		    ;salida 9 en display
+		    MOVWF PORTA
+		   GOTO MINS
+		    
+		   
+		   
+CERO3:
+						    ;salida 0 en display
+		    MOVLW 00111111B
+		    MOVWF PORTC
+RETURN
+		    
+UNO3:
+		    MOVLW 00000110B		    ;salida 1 en display
+		    MOVWF PORTC
+RETURN
+		    
+DOS3:
+		    MOVLW 01011011B		    ;salida 2 en display
+		    MOVWF PORTC
+RETURN
+TRES3:
+		    MOVLW 01001111B		   ;salida 3 en display
+		    MOVWF PORTC
+RETURN
+		    
+CUATRO3:						  
+		    MOVLW 01100110B		    ;salida 4 en display
+		    MOVWF PORTC
+RETURN
+CINCO3:						  
+		    MOVLW 01101101B		    ;salida 5 en display
+		    MOVWF PORTC
+RETURN
+		    
+SEIS3:						  
+		    MOVLW 01111101B		    ;salida 6 en display
+		    MOVWF PORTC
+RETURN
+		    
+SIETE3:						  
+		    MOVLW 00000111B		    ;salida 7 en display
+		    MOVWF PORTC
+RETURN
+OCHO3:						  
+		    MOVLW 01111111B		    ;salida 8 en display
+		    MOVWF PORTC
+RETURN
+NUEVE3:						  
+		    MOVLW 01101111B		    ;salida 9 en display
+		    MOVWF PORTC
+		   RETURN
+		    
+
+		    
+		    
+END
