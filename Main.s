@@ -120,7 +120,7 @@ INICIALIZACION:
 			CLRF	TRISA,c			;PORTA como salida
 			CLRF	TRISC,c			;PORTA como salida
 
-			MOVLW 0
+			MOVLW 123
 			MOVWF INIT_VALUE
 			MOVLW 0x00
 			MOVWF RESULT
@@ -147,25 +147,26 @@ LOOP:
 			CALL  PLAY
 			BTFSC PORTB,2
 			CALL  PRECARGA
-			MOVF INIT_VALUE, W		;movemos el limite al contador
 		        MOVFF INIT_VALUE, RESULT
 			CALL OP
+
 GOTO LOOP
 			
 			
 			
 PRECARGA:
-		       CALL   DELAY_1DS
+		      CALL   DELAY_1DS
 		       BTFSC   PORTB,2  
 		       GOTO   PRECARGA
 		       MOVLW  0xB4
 		       CPFSEQ INIT_VALUE		    ;bandera de alto si ya es igual al limite
 		       INCF   INIT_VALUE, 1
+		       MOVFF INIT_VALUE, RESULT
+		       CALL OP
 		       GOTO LOOP
 		       
 PAUSA:
-		       CALL   OP
-		       GOTO LOOP
+		       GOTO PAUSA
 		       
 RETURN       
 		  
@@ -187,66 +188,7 @@ PLAY:
 		    CPFSEQ	RESULT
 		    GOTO CONTINUAR
 		    GOTO LOOP
-		    
-DELAY:
-		    CALL DELAY_1S
-		    CALL OP
-		    RETURN
-    
-			
-DELAY_1DS:	    
-		    MOVLW 255
-		    MOVWF TEMP
-		    MOVLW 140
-		    MOVWF V1
-		    MOVLW 3
-		    MOVWF AUX2
-		    NOP
-		    DECFSZ TEMP
-		    GOTO $-2
-		    DECFSZ V1
-		    GOTO $-10
-		    DECFSZ AUX2
-		    GOTO $-16
-		    RETURN
 
-DELAY_5DS:		   
-		  
-		    MOVLW 5
-		    MOVWF V2
-		    NOP
-		    CALL DELAY_1DS
-		    DECFSZ V2
-		    GOTO $-6
-		    RETURN
-DELAY_1S:		   
-		  
-		    MOVLW 10
-		    MOVWF V3
-		    NOP
-		    CALL DELAY_1DS
-		    DECFSZ V3
-		    GOTO $-6
-		    RETURN
-DELAY_5S:		   
-		  
-		    MOVLW 5
-		    MOVWF V4
-		    NOP
-		    CALL DELAY_1S
-		    DECFSZ V4
-		    GOTO $-6
-		    RETURN
-		
-DELAY_10S:		   
-		  
-		    MOVLW 10
-		    MOVWF V5
-		    NOP
-		    CALL DELAY_1S
-		    DECFSZ V5
-		    GOTO $-6
-		    RETURN	
 		    
 		    
 		    
@@ -255,19 +197,20 @@ OP:
 			MOVF   IMP, W
 			SUBLW  60
 			BN     SET_MINUTOS
-			MOVF   IMP, W
-		SD:	SUBLW  9		    ;9-impresion 
+			BZ     SET_MINUTOS
+		SD:	MOVF   IMP, W
+			SUBLW  9		    ;9-impresion 
 			BN    SET_SEGUNDOSD	    ;aun es mayor a 9 
 		MI:				   
 			GOTO  SET_SEGUNDOSU	    ;ponemos segundos unitarios
-
+		
 			RETURN
 			
 SET_MINUTOS:
 			MOVLW 60
 			SUBWF IMP , 1	    ;el numero que dimos -60
 			INCF  MIN, 1	;incrementamos 1 minuto
-			MOVLW 60	
+			MOVLW 59	
 			CPFSGT IMP	;impresion sigue siendo mayor que 60?
 			GOTO SD		;no
 			GOTO  SET_MINUTOS		 ;si; repetir proceso
@@ -277,9 +220,9 @@ SET_SEGUNDOSD:
 			MOVLW 10
 			SUBWF IMP , 1	    ;el numero que dimos -10
 			INCF  SEGD, 1	;incrementamos 1 decimas de segundo
-			MOVLW 10	
+			MOVLW 9	
 			CPFSGT IMP	;impresion sigue siendo mayor que 10?
-			GOTO MI		;no
+			GOTO MI		    ;no
 			GOTO  SET_SEGUNDOSD		 ;si; repetir proceso
 			
 SET_SEGUNDOSU:
@@ -527,50 +470,112 @@ CERO3:
 						    ;salida 0 en display
 		    MOVLW 00111111B
 		    MOVWF PORTC
-RETURN
+GOTO PAUSA		    
 		    
 UNO3:
 		    MOVLW 00000110B		    ;salida 1 en display
 		    MOVWF PORTC
-RETURN
+GOTO PAUSA		    
 		    
 DOS3:
 		    MOVLW 01011011B		    ;salida 2 en display
 		    MOVWF PORTC
-RETURN
+GOTO PAUSA		    
 TRES3:
 		    MOVLW 01001111B		   ;salida 3 en display
 		    MOVWF PORTC
-RETURN
+GOTO PAUSA		    
 		    
 CUATRO3:						  
 		    MOVLW 01100110B		    ;salida 4 en display
 		    MOVWF PORTC
-RETURN
+GOTO PAUSA		    
+
 CINCO3:						  
 		    MOVLW 01101101B		    ;salida 5 en display
 		    MOVWF PORTC
-RETURN
+GOTO PAUSA		    
+
 		    
 SEIS3:						  
 		    MOVLW 01111101B		    ;salida 6 en display
 		    MOVWF PORTC
-RETURN
+GOTO PAUSA		    
+
 		    
 SIETE3:						  
 		    MOVLW 00000111B		    ;salida 7 en display
 		    MOVWF PORTC
-RETURN
+GOTO PAUSA		    
+
 OCHO3:						  
 		    MOVLW 01111111B		    ;salida 8 en display
 		    MOVWF PORTC
-RETURN
+GOTO PAUSA		    
 NUEVE3:						  
 		    MOVLW 01101111B		    ;salida 9 en display
 		    MOVWF PORTC
-		   RETURN
-		    
+GOTO PAUSA		    
 
 		    
 		    
+DELAY:
+		    CALL DELAY_1S
+		    CALL OP
+		    RETURN
+    
+			
+DELAY_1DS:	    
+		    MOVLW 255
+		    MOVWF TEMP
+		    MOVLW 140
+		    MOVWF V1
+		    MOVLW 3
+		    MOVWF AUX2
+		    NOP
+		    DECFSZ TEMP
+		    GOTO $-2
+		    DECFSZ V1
+		    GOTO $-10
+		    DECFSZ AUX2
+		    GOTO $-16
+		    RETURN
+
+DELAY_5DS:		   
+		  
+		    MOVLW 5
+		    MOVWF V2
+		    NOP
+		    CALL DELAY_1DS
+		    DECFSZ V2
+		    GOTO $-6
+		    RETURN
+DELAY_1S:		   
+		  
+		    MOVLW 10
+		    MOVWF V3
+		    NOP
+		    CALL DELAY_1DS
+		    DECFSZ V3
+		    GOTO $-6
+		    RETURN
+DELAY_5S:		   
+		  
+		    MOVLW 5
+		    MOVWF V4
+		    NOP
+		    CALL DELAY_1S
+		    DECFSZ V4
+		    GOTO $-6
+		    RETURN
+		
+DELAY_10S:		   
+		  
+		    MOVLW 10
+		    MOVWF V5
+		    NOP
+		    CALL DELAY_1S
+		    DECFSZ V5
+		    GOTO $-6
+		    RETURN			    
 END
