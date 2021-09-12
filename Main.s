@@ -114,11 +114,13 @@ INICIALIZACION:
 			SETF	LATB,c			;PORTB como entrada
 			CLRF	LATD,c			;PORTD como salida
 			CLRF	LATA,c			;PORTA como salida
-			CLRF	LATC,c			;PORTC como salida
+			CLRF	LATC,c			;PORTE como salida
+			CLRF	LATE,c			;PORTC como salida
 			SETF	TRISB,c			;PORTB como entrada
 			CLRF	TRISD,c			;PORTD como salida
 			CLRF	TRISA,c			;PORTA como salida
-			CLRF	TRISC,c			;PORTA como salida
+			CLRF	TRISE,c			;PORTE como salida
+			CLRF	TRISC,c			;PORTE como salida
 
 			MOVLW 180
 			MOVWF INIT_VALUE
@@ -133,7 +135,6 @@ INICIALIZACION:
 			MOVWF SEGD
 			MOVLW 0x00
 			MOVWF SEGU
-		
 			RETURN
 
 MAIN:
@@ -159,14 +160,13 @@ LOOP:
 			CALL  PRECARGA
 		        MOVFF INIT_VALUE, RESULT
 			CALL OP
-
-GOTO LOOP
+			GOTO LOOP
 			
 			
 			
 PRECARGA:
     
-		CALL   DELAY_1DS
+		       CALL   DELAY_1DS
 		       BTFSC   PORTB,2  
 		       GOTO   PRECARGA
 		       MOVLW  0
@@ -176,8 +176,8 @@ PRECARGA:
 		       CALL OP
 		       RETURN
 MAXIMO:
-		      MOVLW 0
-		   	MOVWF INIT_VALUE
+		       MOVLW 0
+		       MOVWF INIT_VALUE
 		       RETURN
 		       
 PAUSA:
@@ -219,6 +219,7 @@ PLAY:
 		    MOVWF INIT_VALUE
 		    CALL OP
 		    RETURN
+		    
 DELAY:
 		    CALL OP
 		    CALL DELAY_1S
@@ -445,55 +446,73 @@ NUEVE1:
 CERO2:
 						    ;salida 0 en display
 		    MOVLW 00111111B
+		    BCF	  PORTE,0
 		    MOVWF PORTA
 GOTO MINS
 		    
 UNO2:
-		    MOVLW 00000110B		    ;salida 1 en display
+		    MOVLW 00000110B	
+		    BCF	  PORTE,0
+		    		    ;salida 1 en display
 		    MOVWF PORTA
 GOTO MINS
 
 		    
 DOS2:
 		    MOVLW 01011011B		    ;salida 2 en display
+		    		    BSF	  PORTE,0
 		    MOVWF PORTA
 GOTO MINS
 
 TRES2:
 		    MOVLW 01001111B		   ;salida 3 en display
+		    		    		    BSF	  PORTE,0
+
 		    MOVWF PORTA
 GOTO MINS
 
 		    
 CUATRO2:						  
 		    MOVLW 01100110B		    ;salida 4 en display
+		    		    		    BSF	  PORTE,0
+
 		    MOVWF PORTA
 GOTO MINS
 
 CINCO2:						  
 		    MOVLW 01101101B		    ;salida 5 en display
+		    		    		    BSF	  PORTE,0
+
 		    MOVWF PORTA
 GOTO MINS
 
 		    
 SEIS2:						  
 		    MOVLW 01111101B		    ;salida 6 en display
+		    		    		    BSF	  PORTE,0
+
 		    MOVWF PORTA
 GOTO MINS
 
 		    
 SIETE2:						  
 		    MOVLW 00000111B		    ;salida 7 en display
+		    		    		    BCF	  PORTE,0
+
 		    MOVWF PORTA
 GOTO MINS
 
 OCHO2:						  
 		    MOVLW 01111111B		    ;salida 8 en display
+		    		    		    BSF	  PORTE,0
+
 		    MOVWF PORTA
 GOTO MINS
 
 NUEVE2:						  
 		    MOVLW 01101111B		    ;salida 9 en display
+		    		    		    BSF	  PORTE,0
+
 		    MOVWF PORTA
 		   GOTO MINS
 		    
@@ -501,7 +520,7 @@ NUEVE2:
 		   
 CERO3:
 						    ;salida 0 en display
-		    MOVLW 00111111B
+		    MOVLW 10111111B
 		    MOVWF PORTC
 RETURN		    
 		    
@@ -513,12 +532,13 @@ RETURN
 		    
 		    
 DOS3:
-		    MOVLW 01011011B		    ;salida 2 en display
+		    MOVLW 11011011B		    ;salida 2 en display
 		    MOVWF PORTC
 RETURN		    
 		    
 TRES3:
-		    MOVLW 01001111B		   ;salida 3 en display
+		    MOVLW 11001111B		   ;salida 3 en display
+
 		    MOVWF PORTC
 RETURN		    
 		    
@@ -530,14 +550,15 @@ RETURN
 		    
 
 CINCO3:						  
-		    MOVLW 01101101B		    ;salida 5 en display
+		    MOVLW 11101101B		    ;salida 5 en display
+
 		    MOVWF PORTC
 RETURN		    
 		    
 
 		    
 SEIS3:						  
-		    MOVLW 01111101B		    ;salida 6 en display
+		    MOVLW 11111101B		    ;salida 6 en display
 		    MOVWF PORTC
 RETURN		    
 		    
@@ -550,12 +571,12 @@ RETURN
 		    
 
 OCHO3:						  
-		    MOVLW 01111111B		    ;salida 8 en display
+		    MOVLW 11111111B		    ;salida 8 en display
 		    MOVWF PORTC
 RETURN		    
 	    
 NUEVE3:						  
-		    MOVLW 01101111B		    ;salida 9 en display
+		    MOVLW 11101111B		    ;salida 9 en display
 		    MOVWF PORTC
 RETURN		    
 
