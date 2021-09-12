@@ -120,7 +120,7 @@ INICIALIZACION:
 			CLRF	TRISA,c			;PORTA como salida
 			CLRF	TRISC,c			;PORTA como salida
 
-			MOVLW 123
+			MOVLW 180
 			MOVWF INIT_VALUE
 			MOVLW 0x00
 			MOVWF RESULT
@@ -141,6 +141,16 @@ MAIN:
 
 			
 LOOP:
+			MOVLW 0
+			MOVWF MIN
+			MOVWF SEGU
+			MOVWF SEGD
+			MOVWF RESULT
+			
+			MOVLW	0xB5		    
+			SUBWF	INIT_VALUE,	0,1	    
+			BZ	MAXIMO		     
+			
 			BTFSC PORTB,0
 			CALL  PAUSA
 			BTFSC PORTB,1
@@ -155,27 +165,45 @@ GOTO LOOP
 			
 			
 PRECARGA:
-		      CALL   DELAY_1DS
+    
+		CALL   DELAY_1DS
 		       BTFSC   PORTB,2  
 		       GOTO   PRECARGA
-		       MOVLW  0xB4
+		       MOVLW  0
 		       CPFSEQ INIT_VALUE		    ;bandera de alto si ya es igual al limite
-		       INCF   INIT_VALUE, 1
+		       DECF   INIT_VALUE, 1
 		       MOVFF INIT_VALUE, RESULT
 		       CALL OP
-		       GOTO LOOP
+		       RETURN
+MAXIMO:
+		      MOVLW 0
+		   	MOVWF INIT_VALUE
+		       RETURN
 		       
 PAUSA:
-		       GOTO PAUSA
-		       
+			MOVLW 0
+			MOVWF MIN
+			MOVWF SEGU
+			MOVWF SEGD
+			BTFSC PORTB,1
+			GOTO  PLAY
+			BTFSC PORTB,2
+			GOTO  PRECARGA
+		        CALL OP
+			GOTO PAUSA
 RETURN       
 		  
 		       
+	       
 PLAY:
 		    
 		    MOVF INIT_VALUE, W		;movemos el limite al contador
 		    MOVFF INIT_VALUE, RESULT
 		    CONTINUAR:
+			MOVLW 0
+			MOVWF MIN
+			MOVWF SEGU
+			MOVWF SEGD
 			BTFSC PORTB,0
 			GOTO  PAUSA
 			BTFSC PORTB,1
@@ -187,10 +215,15 @@ PLAY:
 		    MOVLW	0
 		    CPFSEQ	RESULT
 		    GOTO CONTINUAR
-		    GOTO LOOP
-
-		    
-		    
+		    MOVLW 0
+		    MOVWF INIT_VALUE
+		    CALL OP
+		    RETURN
+DELAY:
+		    CALL OP
+		    CALL DELAY_1S
+		   
+		    RETURN		    
 		    
 OP:
 			MOVFF  RESULT, IMP
@@ -470,59 +503,65 @@ CERO3:
 						    ;salida 0 en display
 		    MOVLW 00111111B
 		    MOVWF PORTC
-GOTO PAUSA		    
+RETURN		    
+		    
 		    
 UNO3:
 		    MOVLW 00000110B		    ;salida 1 en display
 		    MOVWF PORTC
-GOTO PAUSA		    
+RETURN		    
+		    
 		    
 DOS3:
 		    MOVLW 01011011B		    ;salida 2 en display
 		    MOVWF PORTC
-GOTO PAUSA		    
+RETURN		    
+		    
 TRES3:
 		    MOVLW 01001111B		   ;salida 3 en display
 		    MOVWF PORTC
-GOTO PAUSA		    
+RETURN		    
+		    
 		    
 CUATRO3:						  
 		    MOVLW 01100110B		    ;salida 4 en display
 		    MOVWF PORTC
-GOTO PAUSA		    
+RETURN		    
+		    
 
 CINCO3:						  
 		    MOVLW 01101101B		    ;salida 5 en display
 		    MOVWF PORTC
-GOTO PAUSA		    
+RETURN		    
+		    
 
 		    
 SEIS3:						  
 		    MOVLW 01111101B		    ;salida 6 en display
 		    MOVWF PORTC
-GOTO PAUSA		    
+RETURN		    
+		    
 
 		    
 SIETE3:						  
 		    MOVLW 00000111B		    ;salida 7 en display
 		    MOVWF PORTC
-GOTO PAUSA		    
+RETURN		    
+		    
 
 OCHO3:						  
 		    MOVLW 01111111B		    ;salida 8 en display
 		    MOVWF PORTC
-GOTO PAUSA		    
+RETURN		    
+	    
 NUEVE3:						  
 		    MOVLW 01101111B		    ;salida 9 en display
 		    MOVWF PORTC
-GOTO PAUSA		    
+RETURN		    
 
 		    
 		    
-DELAY:
-		    CALL DELAY_1S
-		    CALL OP
-		    RETURN
+
     
 			
 DELAY_1DS:	    
